@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Oauth 2.0</title>
+    <script type="text/javascript">
+    // First, parse the query string
+    var params = {}, queryString = location.hash.substring(1),
+        regex = /([^&=]+)=([^&]*)/g, m;
+    while (m = regex.exec(queryString)) {
+      params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+    }
+
+    // And send the token over to the server
+    var req = new XMLHttpRequest();
+    // consider using POST so query isn't logged
+    req.open('GET', 'https://' + window.location.host + '/catchtoken?' + queryString, true);
+
+    req.onreadystatechange = function (e) {
+      if (req.readyState == 4) {
+        if(req.status == 200){
+          window.location = params['state']
+        } else if(req.status == 400) {
+          alert('There was an error processing the token.');
+        } else {
+          alert('something else other than 200 was returned');
+        }
+      }
+    };
+    req.send(null);
+    </script>      
+  </head>
+  <body>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-45882676-1', 'gcdc2013-mapjobs.appspot.com');
+      ga('send', 'pageview');
+    </script>    
+  </body>
+</html>
+

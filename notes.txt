@@ -1,0 +1,36 @@
+Searchable:
+ Profile
+ - lastname
+ - firstname
+ Resume
+ - job position
+ - skills (future)
+ Jobs
+ - company name
+ - business type (future)
+ - domain (futures)
+ - job position
+ 
+ 
+Map Features:
+ - directions
+ - distance matrix api
+ - geolocation
+ - Save geolocation, and indicates in the map.
+ - Gets 100 closest map locations
+
+Google Plus Features:
+ - Activity logs after update and create of jobs, resume or profile.
+ - Follow user or page
+ - Like resumes and jobs
+
+Youtube Features:
+ - subscribe to channel
+
+ 
+Problem: 
+ - Search fields: getter, then setter
+ - Getter: job position, skill,
+ - Setter: city, zip code
+ - Google Maps was built to search on places, and not built for customizable getters
+ 

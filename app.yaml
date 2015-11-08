@@ -1,0 +1,28 @@
+application: gcdc2013-mapjobs
+version: 2
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: /(.*\.(gif|png|jpg|js|css|ico|woff|ttf|svg))
+  static_files: static/\1
+  upload: static/(.*\.(gif|png|jpg|js|css|ico|woff|ttf|svg))
+  
+- url: /templates/.*
+  script: templates.app
+  
+- url: .*
+  script: main.app
+
+  
+libraries:
+- name: webapp2
+  version: "2.5.2"
+  
+- name: jinja2
+  version: "2.6"

@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Resumes - MapJobs</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <!-- bootstrap js and css -->
+    <script type="text/javascript" src="/js/jquery-1.10.12.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.js"></script>
+    <script type="text/javascript">
+      var startOauth = function () {
+        var clientId = "676481030478-0fi923mg6rbe1tqbvffr8n5ih56p63gg.apps.googleusercontent.com";
+        var authorizationUrlBase = "https://accounts.google.com/o/oauth2/auth";
+        var redirectUri = "http://localhost:19080/oauth2callback";
+        var scope = "https://www.googleapis.com/auth/plus.me";
+        var url = authorizationUrlBase;
+          url += "?response_type=token"
+            + "&redirect_uri=" + redirectUri
+            + "&client_id=" + encodeURIComponent(clientId)
+            + "&scope=" + encodeURIComponent(scope);
+        var w = window.open(url,'oauth','width=500,height=400');
+      }
+    </script>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap-3.0.0.css" />
+    <style>
+      html, body, #map-canvas { height: 100%; margin: 0px;padding: 0px; }
+      html, body, #content, #map-canvas { height: 100%; margin: 0px;padding: 0px; } 
+      .navbar { padding:0px;margin:0px;}
+      .off { display:none }
+      .on { display:block }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar nav-default navbar-static-top" role="navigation">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/" class="navbar-brand"><img src="/img/logo.png" alt="Map Jobs" /></a>
+      </div>
+      
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <div class="btn-toolbar pull-right" style="margin-right:10px;">
+          <div class="btn-group">
+            <a href="{{ logout_url }}" title="Logged in as {{ user.nickname() }}" type="button" class="btn btn-primary navbar-btn">Logout</a>
+          </div>
+        </div>
+      </div><!-- .navbar-ex1-collapse -->
+    </nav>
+    <div class="space">&nbsp;</div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="nav nav-tabs">
+            <li><a href="/profile/">Profile</a></li>
+            <li class="active"><a href="/resumes/">Resumes</a></li>
+            <li><a href="/jobs/">Jobs</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Resumes</h2>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="btn-toolbar">
+          <div class="btn-group">
+            <a href="/resume/create/" class="btn btn-primary btn-sm">Create</a>
+          </div>
+          <div class="btn-group">
+            <a href="/resume/create/oauth/" class="btn btn-danger btn-sm" title="Copy Google+ Information">Google+</a>
+          </div>
+        </div>
+      </div>
+      <div class="space">&nbsp;</div>
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr><th>Position</th><th>Address</th><th>Link</th></tr>
+            </thead>
+            <tbody>
+              {% if resumes.count() > 0 %}
+                {% for resume in resumes %}
+                <tr style="cursor:pointer" onclick='location.href="/resume/{{resume.key.urlsafe()}}/"'><td>{{resume.position}}</td><td>{{resume.address}}</td><td>{{resume.link}}</td></tr>
+                {% endfor %}
+              {% else %}
+                <tr><td colspan="3">There are no resumes listed</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <div id="oauth2-modal" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Oauth 2 Authorization</h4>
+          </div>
+          <div id="oauth2-modal-body" class="modal-body">
+            Display the body.
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-45882676-1', 'gcdc2013-mapjobs.appspot.com');
+      ga('send', 'pageview');
+    </script>    
+    
+  </body>
+</html>
+

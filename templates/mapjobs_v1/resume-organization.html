@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Resume Detail - MapJobs</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <!-- bootstrap js and css -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap-3.0.0.css" />
+    <script type="text/javascript" src="/js/jquery-1.10.12.min.js"></script>
+    <style> 
+      html, body, #map-canvas { height: 100%; margin: 0px;padding: 0px; }
+      html, body, #content, #map-canvas { height: 100%; margin: 0px;padding: 0px; } 
+      .navbar { padding:0px;margin:0px;}
+      .off { display:none }
+      .on { display:block }
+    </style>
+    <script type="text/javascript">
+      var display = function(btn,id) {
+        var btn_val = $("#"+btn).html();
+        if (btn_val=="Add Organization") $("#"+btn).html("Close Organization Form");
+        else $("#"+btn).html("Add Organization");
+        $("#"+id).toggle('easing');
+        $('#crud-organization-btn').toggle('easing');
+      }
+      var save = function(entity) {
+        var data = new Array();
+        var formEleList = $('form#'+entity).serializeArray();
+        for(var i=0;i<formEleList.length;i++){
+          data[data.length]=new param(formEleList[i].name,formEleList[i].value);
+        }
+        $.ajax({
+          url : '/resume/organization/create',
+          type : 'POST',
+          dataType : 'json',
+          data : data,
+          success : function(data) {
+            var html ='';
+            html+='<div class="alert alert-success">';
+            html+='Success! The data has been saved successfully';
+            html+='</div>';
+            $('#alert').html(html);
+            display('add-organization-btn','add-organization-form')
+          }, 
+          error : function(data) {
+            var html ='';
+            html+='<div class="alert alert-error">';
+            html+='Error! Was not able to save information';
+            html+='</div>';
+            $('#alert').html(html);
+          }
+        });
+      }
+      var param = function (name,value) {
+        this.name = name;
+        this.value = value;
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="navbar nav-default navbar-static-top" role="navigation">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/" class="navbar-brand"><img src="/img/logo.png" alt="Map Jobs" /></a>
+      </div>
+      
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <div class="btn-toolbar pull-right" style="margin-right:10px;">
+          <div class="btn-group">
+            <a href="{{ logout_url }}" title="Logged in as {{ user.nickname() }}" type="button" class="btn btn-primary navbar-btn">Logout</a>
+          </div>
+        </div>
+      </div><!-- .navbar-ex1-collapse -->
+    </nav>
+    <div class="space">&nbsp;</div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="nav nav-tabs">
+            <li><a href="/profile/">Profile</a></li>
+            <li class="active"><a href="/resumes/">Resumes</a></li>
+            <li><a href="/jobs/">Jobs</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Resume Detail</h2>
+        </div>
+      </div>
+      <div class="space">&nbsp;</div>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label class="col-md-4 control-label">Job Position</label>
+              <div class="col-md-8">
+                <p class="form-control-static">{{resume.position}}</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-4 control-label">Address</label>
+              <div class="col-md-8">
+                <p class="form-control-static">{{resume.address}}</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-4 control-label">Link</label>
+              <div class="col-md-8">
+                <p class="form-control-static">{{resume.link}}</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-4 control-label">Description</label>
+              <div class="col-md-8">
+                <p class="form-control-static">{{resume.description}}</p>
+              </div>
+            </div>
+          </div> 
+        </div>
+        <div class="col-md-8" style="border-left:1px solid #afafaf;">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="btn-toolbar">
+                <div class="btn-group">
+                  <a id="add-organization-btn" href="#add_organization" onclick="display('add-organization-btn','add-organization-form')" class="btn btn-default btn-sm">Add Organization</a>
+                </div>
+                <div class="btn-group">
+                  <a href="/resume/organizations/{{resume.key.urlsafe()}}/create/oauth" class="btn btn-danger btn-sm">Google+ Populate Organization</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div id="alert" class="col-md-12">
+            </div>
+          </div>
+          <div class="space">&nbsp;</div>
+          {{job_position}}
+          <div id="add-organization-form" class="row" style="display:none;">
+            <div class="col-md-12">
+              <form id="resume-organization" method="post" action="" role="form">
+                <div class="form-group">
+                  <label for="name">Organization Name</label>
+                  <input type="text" class="form-control" name="name" />
+                </div>
+                <div class="form-group">
+                  <label for="title">Title</label>
+                  <input type="text" class="form-control" name="title" />
+                </div>
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <label for="startDate">Start Date</label>
+                      <input type="date" class="form-control" name="startDate" />
+                    </div>
+                    <div class="col-md-6">
+                      <label for="endDate">End Date</label>
+                      <input type="date" class="form-control" name="endDate" />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="location">Location</label>
+                  <input type="text" class="form-control" name="location" />
+                </div>
+                <div class="form-group">
+                  <label for="department">Department</label>
+                  <input type="text" class="form-control" name="department" />
+                </div>
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <label for="primary">Primary</label>
+                      <select class="form-control" name="primary" />
+                        <option value="true">True</option>
+                        <option value="false" selected="selected">False</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="type">Type</label>
+                      <select class="form-control" name="type" />
+                        <option value="work">Work</option>
+                        <option value="school">School</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="description">Description</label>
+                  <textarea class="form-control" rows="5" name="description" /></textarea>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="btn-toolbar">
+                      <div id="crud-organization-btn" class="btn-group" style="display:none;">
+                        <input type="button" onclick="save('resume-organization')" class="btn btn-primary btn-sm" value="Save Organization">
+                        <!--<input type="submit" class="btn btn-primary btn-sm" value="Save Organization" />-->
+                        <input type="button" onclick="display('add-organization-btn','add-organization-form')" class="btn btn-default btn-sm" value="Close">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" value="{{resume.key.urlsafe()}}" name="resume_urlString" />
+              </form>
+              <div class="space">&nbsp;</div>
+            </div>
+          </div>
+          <ul class="list-group">
+            {% for resumeorg in resumeorgs %}
+            <li class="list-group-item">
+              <div class="btn-toolbar pull-right">
+                <div class="btn-group">
+                  <a href="/resume/organization/{{resumeorg.key.urlsafe()}}/delete" class="btn btn-danger btn-xs">Delete</a>
+                </div>
+              </div>
+              <h4>{{resumeorg.title}}</h4>
+              <h5>{{resumeorg.department}}</h5>
+              <h5>{{resumeorg.name}} at {{resumeorg.location}}</h5>
+              <p>From: {{resumeorg.startDate}} To: {{resumeorg.endDate}}</p>
+              <p>{{resumeorg.description}}</p>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8">
+          <div class="btn-toolbar">
+            <div class="btn-group">
+              <a href="/resume/{{resume.key.urlsafe()}}/update/" class="btn btn-primary">Update</a>
+              <a href="/resume/{{resume.key.urlsafe()}}/delete" class="btn btn-danger">Delete</a>
+              <a href="/resumes/" class="btn btn-default">Cancel</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <br>
+    <br>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-45882676-1', 'gcdc2013-mapjobs.appspot.com');
+      ga('send', 'pageview');
+    </script>    
+  </body>
+</html>
+

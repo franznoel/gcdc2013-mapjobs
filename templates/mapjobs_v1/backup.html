@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocation</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <!-- bootstrap js and css -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap-3.0.0.css" />
+    <style>
+      html, body, #map-canvas { height: 100%; margin: 0px;padding: 0px; }
+      html, body, #content, #map-canvas { height: 100%; margin: 0px;padding: 0px; } 
+      .navbar { padding:0px;margin:0px;}
+      .off { display:none }
+      .on { display:block }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar nav-default navbar-fixed-top" role="navigation">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand">Map Jobs</a>
+      </div>
+      
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <form class="navbar-form navbar-left" role="search">
+          <div class="form-group">
+            <input id="s" type="text" class="form-control input-md" size="120" name="s" placeholder="Search company names, number of employees, people, job opening, and skills around the area using zip codes.">
+          </div>
+          <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <div class="btn-toolbar pull-right" style="margin-right:10px;">
+          <div class="btn-group">
+            {% if current_user != 'Sign in' %}
+            <button onclick="showOpportunities()" type="button" class="btn btn-default navbar-btn">Opportunities</button>
+            {% endif %}
+            <a href="{{ user_url }}" title="{{ title }}" type="button" class="btn btn-primary navbar-btn">{{ current_user }}</a>
+          </div>
+        </div>
+      </div><!-- .navbar-ex1-collapse -->
+    </nav>
+    
+    <div id="content" class="row">
+      <div id="map-canvas" class="col-md-12" style="margin:0px;padding:0px;"></div>
+      
+      <div id="data" style="float:right;display:none;position:absolute;top:60px;" class="col-md-12">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="space">&nbsp;</div>
+                <div class="tab-content">
+                
+                  <div id="create-jobs" class="form tab-pane" style="background-color:#fff;">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h3 style="margin:0px;padding:0px;">Create Jobs</h3>
+                      </div>
+                      <div class="panel-body">
+                        <div id="message"></div>
+                        <form id="create-jobs-form" method="post" action="" role="form">
+                          <div class="form-group">
+                            <label for="company">Company Name</label>
+                            <input type="text" class="form-control" name="company" value="" placeholder="Company"/>
+                          </div>
+                          <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea class="form-control" cols="5" name="address" placeholder="Complete Address"></textarea>
+                          </div>
+                          <div class="form-group">
+                            <label for="position">Job Position</label>
+                            <input type="text" class="form-control" name="position" value="" placeholder="Job Position" />
+                          </div>
+                          <div class="form-group">
+                            <label for="link">Link</label>
+                            <input type="text" class="form-control" name="link" value="" placeholder="Link"/>
+                          </div>
+                          <div class="btn-toolbar">
+                            <div class="btn-group">
+                              <button type="button" onclick="create('job','create-jobs-form')"  class="btn btn-primary">Save</button>
+                              <button type="button" onclick="clearForm('create-jobs-form')"  class="btn btn-default">Clear</button>
+                              <button type="button" onclick="close_form()" class="btn btn-default">Close</button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div><!-- #create-jobs -->
+                  
+                  <div id="update-jobs" class="form tab-pane" style="background-color:#fff;">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h3 style="margin:0px;padding:0px;">Update Jobs</h3>
+                      </div>
+                      <div class="panel-body">
+                        <div id="message"></div>
+                        <form id="create-jobs-form" method="post" action="" role="form">
+                          <div class="form-group">
+                            <label for="company">Company Name</label>
+                            <input id="jobs-company" type="text" class="form-control" name="company" value="" placeholder="Company"/>
+                          </div>
+                          <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea id="jobs-address" class="form-control" cols="5" name="address" placeholder="Complete Address"></textarea>
+                          </div>
+                          <div class="form-group">
+                            <label for="position">Job Position</label>
+                            <input id="jobs-position" type="text" class="form-control" name="position" value="" placeholder="Job Position" />
+                          </div>
+                          <div class="form-group">
+                            <label for="link">Link</label>
+                            <input id="jobs-link" type="text" class="form-control" name="link" value="" placeholder="Link"/>
+                          </div>
+                          <div class="btn-toolbar">
+                            <div class="btn-group">
+                              <button type="button" onclick="update('job','create-jobs-form')"  class="btn btn-primary">Update</button>
+                              <button type="button" onclick="clearForm('create-jobs-form')"  class="btn btn-default">Clear</button>
+                              <button type="button" onclick="close_form()" class="btn btn-default">Close</button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div><!-- #update-jobs -->                  
+                  
+                  <div id="create-resume" class="form tab-pane" style="background-color:#fff;">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h3 style="margin:0px;padding:0px;">Create Resume</h3>
+                      </div>
+                      <div class="panel-body">
+                        <form id="create-resume-form" method="post" action="" role="form">
+                          <div class="form-group">
+                            <label for="position">Job Position</label>
+                            <input type="text" class="form-control" name="position" value="" placeholder="Job Position" />
+                          </div>
+                          <div class="form-group">
+                            <label for="link">Link</label>
+                            <input type="text" class="form-control" name="link" value="" placeholder="Link"/>
+                          </div>
+                          <div class="btn-toolbar">
+                            <div class="btn-group">
+                              <button type="button" onclick="create('resume','create-resume-form')" class="btn btn-primary">Save</button>
+                              <button type="button" onclick="clearForm('create-resume-form')"  class="btn btn-default">Clear</button>
+                              <button type="button" onclick="close_form()" class="btn btn-default">Close</button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div><!-- #create-resume -->
+                  
+                  <div id="update-resume" class="form tab-pane" style="background-color:#fff;">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h3 style="margin:0px;padding:0px;">Create Resume</h3>
+                      </div>
+                      <div class="panel-body">
+                        <form id="update-resume-form" method="post" action="" role="form">
+                          <div class="form-group">
+                            <label for="position">Job Position</label>
+                            <input id="resume-position" type="text" class="form-control" name="position" value="" placeholder="Job Position" />
+                          </div>
+                          <div class="form-group">
+                            <label for="link">Link</label>
+                            <input id="resume-link" type="text" class="form-control" name="link" value="" placeholder="Link"/>
+                          </div>
+                          <div class="btn-toolbar">
+                            <div class="btn-group">
+                              <button type="button" onclick="update('resume','create-resume-form')" class="btn btn-primary">Update</button>
+                              <button type="button" onclick="clearForm('create-resume-form')"  class="btn btn-default">Clear</button>
+                              <button type="button" onclick="close_form()" class="btn btn-default">Close</button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div><!-- #update-resume -->                  
+
+                  <div id="update-profile" class="form tab-pane" style="background-color:#fff;">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h3 style="margin:0px;padding:0px;">Update Profile</h3>
+                      </div>
+                      <div class="panel-body">
+                        <form id="update-profile-form" method="post" action="" role="form">
+                          <div class="form-group">
+                            <label for="firstname">First Name</label>
+                            <input type="text" class="form-control" name="firstname" value="{{profile.firstname}}" placeholder="First Name" />
+                          </div>
+                          <div class="form-group">
+                            <label for="lastname">Last Name</label>
+                            <input type="text" class="form-control" name="lastname" value="{{profile.lastname}}" placeholder="Last Name" />
+                          </div>
+                          <div class="form-group">
+                            <label for="addres">Address</label>
+                            <textarea type="text" class="form-control" name="address" rows="5" placeholder="Complete Address">{{profile.address}}</textarea>
+                          </div>
+                          <div class="form-group">
+                            <label for="link">Link</label>
+                            <input type="text" class="form-control" name="link" value="{{profile.link}}" placeholder="Link"/>
+                          </div>
+                          <div class="btn-toolbar">
+                            <div class="btn-group">
+                              <button type="button" onclick="update('profile','update-profile-form')" class="btn btn-primary">Update</button>
+                              <button type="button" onclick="close_form()" class="btn btn-default">Close</button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div><!-- #update-profile -->
+                
+                </div><!-- .tab-content -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="panel panel-default">
+              <div class="panel-body">
+                <ul class="nav nav-tabs">
+                  <li class="active"><a href="#jobs" >Jobs</a></li>
+                  <li><a href="#resumes">Resumes</a></li>
+                  <li><a href="#profile">Profile</a></li>
+                </ul>
+                
+                <div class="space">&nbsp;</div>
+                
+                <div class="tab-content">
+                  <div id="jobs" class="tab-pane active">
+                    <div class="btn-toolbar">
+                      <div class="btn-group">
+                        <a href="#my-jobs" class="btn btn-default">My Jobs</a>
+                        <a href="#all-jobs" class="btn btn-default">All Jobs</a>
+                        <button onclick="show_form('create-jobs')" class="btn btn-primary">Create Jobs</button>
+                      </div>
+                    </div>
+                    <div class="space">&nbsp;</div>
+                    <div class="tab-content">
+                      <div id="my-jobs" class="tab-pane active">
+                        You don't have jobs listed.
+                      </div>
+                      <div id="all-jobs" class="tab-pane">
+                        No jobs listed.
+                      </div>
+                    </div>
+                  </div><!-- jobs -->
+                  
+                  <div id="resumes" class="tab-pane">
+                    <div class="btn-toolbar">
+                      <div class="btn-group">
+                        <a href="#my-resumes" class="btn btn-default" >My Resumes</a>
+                        <a href="#all-resumes" class="btn btn-default" >All Resumes</a>
+                        <a onclick="show_form('create-resume')"  class="btn btn-primary">Create Resume</a>
+                      </div>
+                    </div>
+                    <div class="space">&nbsp;</div>
+                    <div class="tab-content">
+                      <div id="my-resumes" class="tab-pane active">
+                        You do not have any resume listed.
+                      </div>
+                      <div id="all-resumes" class="tab-pane">
+                        No listed resumes.
+                      </div>
+                    </div>
+                  </div><!-- resume -->
+                  
+                  <div id="profile" class="tab-pane">
+                    <div class="btn-toolbar">
+                      <div class="btn-group">
+                        <a onclick="show_form('update-profile')"  class="btn btn-primary">Update Profile</a>
+                      </div>
+                    </div>
+                    <div class="space">&nbsp;</div>
+                      <div class="form-horizontal" role="form">
+                        <div class="form-group">
+                          <label class="col-md-4 control-label">First Name</label>
+                          <div class="col-md-8">
+                            <p id="profile_firstname" class="form-control-static">{{profile.firstname}}</p>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-md-4 control-label">Last Name</label>
+                          <div class="col-md-8">
+                            <p id="profile_lastname" class="form-control-static">{{profile.lastname}}</p>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-md-4 control-label">Address</label>
+                          <div class="col-md-8">
+                            <p id="profile_address" class="form-control-static">{{profile.address}}</p>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-md-4 control-label">Link</label> 
+                          <div class="col-md-8">
+                            <p class="form-control-static">{{profile.link}}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div><!-- #profile -->
+                </div>
+                  
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <script type="text/javascript" src="/js/jquery-1.10.12.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-collapse.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-transition.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-45882676-1', 'gcdc2013-mapjobs.appspot.com');
+      ga('send', 'pageview');
+    </script>    
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+    <script type="text/javascript" src="/js/map.js"></script>
+  </body>
+</html>
+
+
+
+

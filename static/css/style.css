@@ -1,0 +1,26 @@
+label.error {
+  font-size: 12px;
+  font-style: italic;
+  font-weight: normal;
+  color: red;
+}
+
+#nav-inner {
+  border-right: 1px solid #dfdfdf;
+}
+#nav-inner li {
+  border-bottom: 1px solid #dfdfdf;
+}
+#nav-inner li.active {
+  background-color: #efefef;
+}
+
+#info {
+  margin-top: 10px;
+}
+#info td:first-child {
+  width: 160px;
+  font-weight:bold;
+  text-align: right;
+}
+
